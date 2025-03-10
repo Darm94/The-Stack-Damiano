@@ -1,19 +1,34 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     PrimitiveType primitiveToPlace;
+    private Color _colorToPlace;
     Vector3 nextShapePreviewPos = new Vector3(-7, 1, 1);
     GameObject previewObject;
-
+    private Dictionary<int, Color> _colorsEnum; 
     private void Start()
     {
+        AssignTeamsColor();
         GenerateNextShape();
+        
     }
 
+    void AssignTeamsColor()
+    {
+        _colorsEnum =new Dictionary<int, Color>()
+        {
+            { 0, GetRandomColor() },
+            { 1, GetRandomColor() },
+            { 2, GetRandomColor() },
+            { 3, GetRandomColor() },
+            { 4, GetRandomColor() }
+        };
+    }
     void GenerateNextShape()
     {
-        switch (Random.Range(0, 4)) // 0..3 (4 è escluso)
+        switch (Random.Range(0, 4)) // 0..3 (4 excluded)
         {
             case 0: primitiveToPlace = PrimitiveType.Cube; break;
             case 1: primitiveToPlace = PrimitiveType.Sphere; break;
@@ -21,10 +36,13 @@ public class GameManager : MonoBehaviour
             case 3: primitiveToPlace = PrimitiveType.Cylinder; break;
             default: primitiveToPlace = PrimitiveType.Cube; break;
         }
-
+        //Color match
+        _colorToPlace = _colorsEnum[Random.Range(0, 5)];
+            
         if (previewObject) Destroy(previewObject);
 
         previewObject = GameObject.CreatePrimitive(primitiveToPlace);
+        previewObject.GetComponent<MeshRenderer>().material.color = _colorToPlace;
         previewObject.name = "Preview shape";
         previewObject.transform.position = nextShapePreviewPos;
     }
@@ -45,26 +63,16 @@ public class GameManager : MonoBehaviour
                 go.transform.rotation = Random.rotation;
 
                 go.AddComponent<Rigidbody>();
-
-                // Controllo casualità del colore
-                Color randomColor = Random.ColorHSV();
-
-                float H, S, V;
-                Color.RGBToHSV(randomColor, out H, out S, out V);
-
-                S = 0.8f;
-                V = 0.8f;
-
-                randomColor = Color.HSVToRGB(H, S, V);
-
-                go.GetComponent<MeshRenderer>().material.color = randomColor;
+                
+                
+                MeshRenderer meshRenderer = go.GetComponent<MeshRenderer>();
+                meshRenderer.material.color = _colorToPlace;
 
                 // DEVE ESSERE ALL'INTERNO DI Assets/Resources
-                Texture texture = Resources.Load<Texture>("wood_texture");
-
+                Texture texture = Resources.Load<Texture>("unsic-texture");
                 Debug.Log(texture);
 
-                go.GetComponent<MeshRenderer>().material.mainTexture = texture; // Correzione: mainTexture
+                meshRenderer.material.mainTexture = texture; // Correzione: mainTexture
 
                 go.AddComponent<DestroyOnFall>();
                 go.AddComponent<DragWithMouse>();
@@ -73,6 +81,21 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-    
+
+    private static Color GetRandomColor()
+    {
+        // Controllo casualità del colore
+        Color randomColor = Random.ColorHSV();
+
+        float H, S, V;
+        Color.RGBToHSV(randomColor, out H, out S, out V);
+
+        S = 0.8f;
+        V = 0.95f;
+
+        randomColor = Color.HSVToRGB(H, S, V);
+        
+        return randomColor;
+    }
     
 }
