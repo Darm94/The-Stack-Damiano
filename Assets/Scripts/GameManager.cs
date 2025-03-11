@@ -14,14 +14,22 @@ public class GameManager : MonoBehaviour
     private int _scoreCounter = 0;
     [SerializeField] private int _maxLifePoints = 5;
     private int _lifePoints;
+    
+    //Editor Variables for spawned objects
+    [SerializeField] private float rotationSpeed = 100f;
+    [SerializeField] private KeyCode rotateForwardKey = KeyCode.W;
+    [SerializeField] private KeyCode rotateBackwardKey = KeyCode.S;
+    [SerializeField] private KeyCode rotateLeftKey = KeyCode.A;
+    [SerializeField] private KeyCode rotateRightKey = KeyCode.D;
+    [SerializeField] private KeyCode deepMovementKey =KeyCode.LeftShift;
 
+    //lifePoints property
     public int LifePoints
     {
         get { return _lifePoints; }
         set { _lifePoints = value; }
     }
     
-    //public int _lifePoints { get; set; }
     private void Start()
     {
         _lifePoints = _maxLifePoints;
@@ -73,6 +81,7 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        //GameOverCheck
         if (_lifePoints<=0)
         {
             //GameOver();
@@ -82,23 +91,28 @@ public class GameManager : MonoBehaviour
             
         }
         
-        if (Input.GetMouseButtonDown(1)) // Clic del mouse destro
+        //Spawn new Objects
+        if (Input.GetMouseButtonDown(1)) // Right Click 
         {
-            _scoreCounter++;
-            Debug.Log("Score: " + _scoreCounter);
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit, 100)) // 100 metri/unità di distanza massima
+            if (Physics.Raycast(ray, out hit, 100))
             {
+                //Score update
+                _scoreCounter++;
+                Debug.Log("Score: " + _scoreCounter);
+                
+                // Spawn Sound
                 if (_spawnSound&& _audioSource)
                 {
-                    _audioSource.PlayOneShot(_spawnSound); // Riproduci il suono
+                    _audioSource.PlayOneShot(_spawnSound); 
                 }
+                
+                //New Game Object
                 GameObject go = GameObject.CreatePrimitive(primitiveToPlace);
-
                 go.transform.localScale = Vector3.one * 0.3f;
-                go.transform.position = hit.point + new Vector3(0, 1, 0); // Sposta di 1 metro verso l'alto
+                go.transform.position = hit.point + new Vector3(0, 1, 0);
                 go.transform.rotation = Random.rotation;
                 
                 //add RigidBody
@@ -120,9 +134,14 @@ public class GameManager : MonoBehaviour
                 
                 //add custom scripts
                 go.AddComponent<DestroyOnFall>();
-                go.AddComponent<DragWithMouse>();
+                DragWithMouse dwm = go.AddComponent<DragWithMouse>();
                 go.AddComponent<TeamDestroy>();
 
+                //DragWithMouse variables set
+                dwm.KeysMapSet(rotateForwardKey, rotateBackwardKey, rotateLeftKey, rotateRightKey, deepMovementKey);
+                dwm.RotationSpeedSet(rotationSpeed);
+                
+                //next preview
                 GenerateNextShape();
             }
         }
@@ -135,12 +154,9 @@ public class GameManager : MonoBehaviour
 
         float H, S, V;
         Color.RGBToHSV(randomColor, out H, out S, out V);
-
         S = 0.8f;
         V = 0.95f;
-
         randomColor = Color.HSVToRGB(H, S, V);
-        
         return randomColor;
     }
     

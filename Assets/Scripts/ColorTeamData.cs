@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class ColorTeamData : MonoBehaviour
 {
-    private int _colorTeam; // Variabile privata
+    private int _colorTeam; 
 
-    public int ColorTeam // Proprietà pubblica get e set
+    public int ColorTeam // Proprerty for colorTeam
     {
         get { return _colorTeam; }
         set { _colorTeam = value; }

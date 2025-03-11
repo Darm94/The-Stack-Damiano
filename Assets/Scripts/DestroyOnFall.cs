@@ -4,7 +4,7 @@ using UnityEngine;
 public class DestroyOnFall : MonoBehaviour
 {
     
-    // Update is called once per frame
+    // Not fixed : Update is called once per frame
     void Update()
     {
         if (transform.position.y < -10)
@@ -18,7 +18,6 @@ public class DestroyOnFall : MonoBehaviour
                 gm.LifePoints--;
                 Debug.Log("LIFE POINTS: " + gm.LifePoints);
             }
-            
             Destroy(gameObject);
         }
     }
