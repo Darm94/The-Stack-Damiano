@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
@@ -18,12 +17,12 @@ public class DragWithMouse : MonoBehaviour
     private KeyCode _rotateLeftKey = KeyCode.A;
     private KeyCode _rotateRightKey = KeyCode.D;
     private KeyCode _deepMovementKey =KeyCode.LeftShift; 
-    private Vector3 _rotationAxis = Vector3.zero; // Asse di rotazione
-    private float _rotationDirection = 0f; // Direzione di rotazione (-1 o 1)
+    private Vector3 _rotationAxis = Vector3.zero; // Rotation Axis
+    private float _rotationDirection = 0f; // Rotation Direction (-1 or 1)
     private bool _isDragging = false;
     private bool _isShifting = false;
-    private float _currentZ; // Posizione Z corrente dell'oggetto
-    private float _initialMouseY; // Posizione Y iniziale del mouse quando Shift è premuto
+    private float _currentZ; // Variable for actual Z axis position of the object
+    private float _initialMouseY; // Variable for actual Y position when start deep movement
     private TeamDestroy _collisionCounter;
 
    public void KeysMapSet(KeyCode rotateForwardKey, KeyCode rotateBackwardKey, KeyCode rotateLeftKey, KeyCode rotateRightKey, KeyCode deepMovementKey)
@@ -50,7 +49,7 @@ public class DragWithMouse : MonoBehaviour
     {
         RotateCheck();
         
-        bool wasShifting = _isShifting;  // Salviamo lo stato precedente di isShifting
+        bool wasShifting = _isShifting;  // Save precedent state of isShifting
         _isShifting = Input.GetKey(_deepMovementKey);
         
         
@@ -63,7 +62,7 @@ public class DragWithMouse : MonoBehaviour
             
         }
         
-        // Se prima era in modalità Shift e ora non lo è più, aggiorniamo l'offset per evitare scatti
+        // If before was Shifting, update the offset to avoid position teleport
         if (wasShifting && !_isShifting)
         {
             _screenPoint = Camera.main.WorldToScreenPoint(transform.position);
@@ -120,7 +119,14 @@ public class DragWithMouse : MonoBehaviour
         _nextPosition = Vector3.zero;
         _isDragging = true;
         
-        // Disattiva la componente per evitare che distrugga l'oggetto durante il trascinamento
+        // If we are already pressing Shift upload actual position (to evoid deep z axis teleport of the object)
+        if (_isShifting)
+        {
+            _currentZ = transform.position.z;
+            _initialMouseY = Input.mousePosition.y;
+        }
+        
+        // Disable the component to avoid the distruction during Drag Session
         if (_collisionCounter)
         {
             _collisionCounter.enabled = false;
@@ -135,10 +141,11 @@ public class DragWithMouse : MonoBehaviour
         Vector3 curScreenPoint;
         if (_isShifting)
         {
-            curScreenPoint = new Vector3(Input.mousePosition.x, _screenPoint.y, _screenPoint.z); 
-            float zOffset = (Input.mousePosition.y - _initialMouseY) * 0.01f; // Sensibilità del movimento
+            //curScreenPoint = new Vector3(Input.mousePosition.x, _screenPoint.y, _screenPoint.z); 
+            //How much move the Z position
+            float zOffset = (Input.mousePosition.y - _initialMouseY) * 0.01f;
 
-            // Mantenere la posizione XY attuale, modificando solo la Z globale
+            // Keep actual XY position, modifying the Z using the Zoffset
             _nextPosition = new Vector3(transform.position.x, transform.position.y, _currentZ + zOffset);
         }
         else
@@ -160,7 +167,7 @@ public class DragWithMouse : MonoBehaviour
         if (_isDragging && _rotationAxis != Vector3.zero)
         {
             Quaternion rotation = Quaternion.AngleAxis(_rotationSpeed * _rotationDirection * Time.fixedDeltaTime, _rotationAxis);
-            _rigidBody.MoveRotation(_rigidBody.rotation * rotation); // Correzione: Applica la rotazione al Rigidbody
+            _rigidBody.MoveRotation(_rigidBody.rotation * rotation); // fix: apply the rotation to rigidBody us Quaternion (costruction of the rotation taken from web)
         }
     }
 
@@ -169,7 +176,7 @@ public class DragWithMouse : MonoBehaviour
             
             _isDragging = false;
             _isShifting = false;
-            // Disattiva la componente
+            // TeamDestroy component restoration
             if (_collisionCounter)
             {
                 _collisionCounter.enabled = true;

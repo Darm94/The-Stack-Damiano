@@ -12,6 +12,7 @@ public class TeamDestroy : MonoBehaviour
     {
         _myTeamData = GetComponent<ColorTeamData>();
         //_audioSource = gameObject.AddComponent<AudioSource>(); //not working for now , i had to use camera audiosource
+        _audioSource= Camera.main.gameObject.GetComponent<AudioSource>();
         _destructionSound=Resources.Load<AudioClip>("destroy_sound");
     }
     private void OnCollisionEnter(Collision collision)
@@ -34,9 +35,9 @@ public class TeamDestroy : MonoBehaviour
                 if (_destructionSound != null && _audioSource != null)
                 {
                     Debug.Log($"SOUND DESTRUCTION");
-                    //audioSource.PlayOneShot(destructionSound); // Not Working for now, need to applicate sound on camera
+                    //audioSource.PlayOneShot(destructionSound); // Not Working for now on my audiosource, need to applicate sound on camera
                     //get camera audio source
-                    _audioSource= Camera.main.gameObject.GetComponent<AudioSource>();
+                    
                     _audioSource.PlayOneShot(_destructionSound); 
                 }
                 Destroy(gameObject);
