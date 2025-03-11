@@ -16,6 +16,8 @@ public class TeamDestroy : MonoBehaviour
     }
     private void OnCollisionEnter(Collision collision)
     {
+        if (!enabled) return;
+        
         // Ottieni il componente ColorTeamData dall'oggetto con cui è avvenuta la collisione
         ColorTeamData otherTeamData = collision.gameObject.GetComponent<ColorTeamData>();
         TeamDestroy otherTeamDestroy = collision.gameObject.GetComponent<TeamDestroy>(); // Controllo su TeamDestroy
@@ -44,6 +46,7 @@ public class TeamDestroy : MonoBehaviour
 
     private void OnCollisionExit(Collision collision)
     {
+        if (!enabled) return;
         // Ottieni il componente ColorTeamData dall'oggetto con cui è avvenuta la collisione
         ColorTeamData otherTeamData = collision.gameObject.GetComponent<ColorTeamData>();
         TeamDestroy otherTeamDestroy = collision.gameObject.GetComponent<TeamDestroy>();

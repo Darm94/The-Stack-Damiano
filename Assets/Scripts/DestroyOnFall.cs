@@ -9,8 +9,16 @@ public class DestroyOnFall : MonoBehaviour
     {
         if (transform.position.y < -10)
         {
-            GameManager gm = Camera.main.GetComponent<GameManager>();
-            gm.LifePoints--;
+            Camera mainCamera = Camera.main;
+            GameManager gm = null;
+            if(mainCamera)
+                gm = mainCamera.GetComponent<GameManager>();
+            if (gm)
+            {
+                gm.LifePoints--;
+                Debug.Log("LIFE POINTS: " + gm.LifePoints);
+            }
+            
             Destroy(gameObject);
         }
     }

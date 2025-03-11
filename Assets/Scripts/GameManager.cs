@@ -73,14 +73,19 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (_lifePoints>=0)
+        if (_lifePoints<=0)
         {
             //GameOver();
+            Debug.Log("GAME OVER");
+            GetComponent<Camera>().enabled = false;
+            this.enabled = false;
+            
         }
         
         if (Input.GetMouseButtonDown(1)) // Clic del mouse destro
         {
             _scoreCounter++;
+            Debug.Log("Score: " + _scoreCounter);
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
@@ -111,7 +116,7 @@ public class GameManager : MonoBehaviour
                 //add and assign team data
                 ColorTeamData teamData = go.AddComponent<ColorTeamData>();
                 teamData.ColorTeam = _teamToAssign;
-                Debug.Log(teamData.ColorTeam);
+                //Debug.Log(teamData.ColorTeam);
                 
                 //add custom scripts
                 go.AddComponent<DestroyOnFall>();
